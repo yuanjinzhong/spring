@@ -110,6 +110,7 @@ public final class SqlSessionUtils {
     LOGGER.debug(() -> "Creating a new SqlSession");
     session = sessionFactory.openSession(executorType);
 
+    //获取session后，和当前事务绑定起来？？
     registerSessionHolder(sessionFactory, executorType, exceptionTranslator, session);
 
     return session;
@@ -119,6 +120,7 @@ public final class SqlSessionUtils {
    * Register session holder if synchronization is active (i.e. a Spring TX is active).
    * <p>
    * Note: The DataSource used by the Environment should be synchronized with the transaction either through
+   * 事务管理、或者同步期间，假设右异常抛出，则会关闭或者回滚链接，调用Connection的方法
    * DataSourceTxMgr or another tx synchronization. Further assume that if an exception is thrown, whatever started the
    * transaction will handle closing / rolling back the Connection associated with the SqlSession.
    *
@@ -131,6 +133,7 @@ public final class SqlSessionUtils {
    * @param session
    *          sqlSession used for registration.
    */
+  //极其重要的方法
   private static void registerSessionHolder(SqlSessionFactory sessionFactory, ExecutorType executorType,
       PersistenceExceptionTranslator exceptionTranslator, SqlSession session) {
     SqlSessionHolder holder;
@@ -144,6 +147,7 @@ public final class SqlSessionUtils {
         TransactionSynchronizationManager.bindResource(sessionFactory, holder);
         TransactionSynchronizationManager
             .registerSynchronization(new SqlSessionSynchronization(holder, sessionFactory));
+        // 标识位：和事务保持同步？
         holder.setSynchronizedWithTransaction(true);
         holder.requested();
       } else {
