@@ -110,7 +110,11 @@ public final class SqlSessionUtils {
     LOGGER.debug(() -> "Creating a new SqlSession");
     session = sessionFactory.openSession(executorType);
 
+<<<<<<< HEAD
     //获取session后，和当前事务绑定起来？？
+=======
+    //新创建的sqlSession和资源管理器绑定
+>>>>>>> 78bf9e63 (加点注射)
     registerSessionHolder(sessionFactory, executorType, exceptionTranslator, session);
 
     return session;
@@ -144,6 +148,7 @@ public final class SqlSessionUtils {
         LOGGER.debug(() -> "Registering transaction synchronization for SqlSession [" + session + "]");
 
         holder = new SqlSessionHolder(session, executorType, exceptionTranslator);
+        //holder 就是sqlSession; 将sqlSession和sessionFactory绑定
         TransactionSynchronizationManager.bindResource(sessionFactory, holder);
         TransactionSynchronizationManager
             .registerSynchronization(new SqlSessionSynchronization(holder, sessionFactory));
