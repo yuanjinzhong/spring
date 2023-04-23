@@ -99,6 +99,7 @@ public final class SqlSessionUtils {
 
     session = sessionFactory.openSession(executorType);
 
+    //新创建的sqlSession和资源管理器绑定
     registerSessionHolder(sessionFactory, executorType, exceptionTranslator, session);
 
     return session;
@@ -129,6 +130,7 @@ public final class SqlSessionUtils {
         }
 
         holder = new SqlSessionHolder(session, executorType, exceptionTranslator);
+        //holder 就是sqlSession; 将sqlSession和sessionFactory绑定
         TransactionSynchronizationManager.bindResource(sessionFactory, holder);
         TransactionSynchronizationManager.registerSynchronization(new SqlSessionSynchronization(holder, sessionFactory));
         holder.setSynchronizedWithTransaction(true);
